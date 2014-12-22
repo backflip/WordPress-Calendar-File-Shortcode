@@ -59,13 +59,14 @@ class WP_ICS_Shortcode {
 			'link' => '',
 			'filename' => 'entry.ics',
 			'linkclass' => 'calendar',
-			'linktext' => 'Add to calendar',
-			'dateformat' => get_option( 'date_format' ) . ' ' . get_option( 'time_format' )
+			'linktext' => 'Add to calendar'
 		), $atts );
 
 		$mandatory_options = array( 'start', 'end', 'title' );
+		$date_options = array( 'start', 'end' );
 
 		$missing_option = null;
+		$invalid_option = null;
 
 		foreach ( $mandatory_options as $param ) {
 			if ( ! $options[$param] ) {
@@ -74,9 +75,21 @@ class WP_ICS_Shortcode {
 			}
 		}
 
+		foreach ( $date_options as $param ) {
+			if ( ! $this->parse_date( $options[$param] ) ) {
+				$invalid_option = $param;
+				break;
+			}
+		}
+
 		// Render warning if mandatory options are missing
 		if ( $missing_option ) {
 			return 'Calendar Shortcode: Missing "' . $missing_option . '" parameter';
+		}
+
+		// Render warning if start or end date are not parseable by strtotime
+		if ( $invalid_option ) {
+			return 'Calendar Shortcode: Parameter "' . $invalid_option . '" not parseable by strtotime. Please use valid format.';
 		}
 
 		// Save to database and get row ID
@@ -203,14 +216,14 @@ VERSION:2.0
 PRODID:-//hacksw/handcal//NONSGML v1.0//EN
 CALSCALE:GREGORIAN
 BEGIN:VEVENT
-DTEND:{$this->format_date( $options["end"], $options["dateformat"] )}
+DTEND:{$this->format_date( $options["end"] )}
 UID:{$uniqid}
 DTSTAMP:{$this->format_date( time() )}
 LOCATION:{$this->escape_string( $options['location'] )}
 DESCRIPTION:{$this->escape_string( $options['description'] )}
 URL;VALUE=URI:{$this->escape_string( $options['link'] )}
 SUMMARY:{$this->escape_string( $options['title'] )}
-DTSTART:{$this->format_date( $options['start'], $options["dateformat"] )}
+DTSTART:{$this->format_date( $options['start'] )}
 END:VEVENT
 END:VCALENDAR
 EOT;
@@ -220,20 +233,17 @@ EOT;
 		return preg_replace( '/( [\,;] )/','\\\$1', $string );
 	}
 
-	protected function format_date( $date_string, $format = null ) {
-		$format_ics = 'Ymd\THis\Z';
+	protected function parse_date( $date_string ) {
+		return strtotime( $date_string );
+	}
 
-		if ( $format ) {
-			$timezone = new DateTimeZone( $this->get_timezone_string() );
+	protected function format_date( $date_string ) {
+		date_default_timezone_set( $this->get_timezone_string() );
 
-			$date = DateTime::createFromFormat( $format, $date_string, $timezone );
+		$date = $this->parse_date( $date_string );
+		$format = 'Ymd\THis\Z';
 
-			$date_string = $date->getTimestamp();
-		}
-
-		$date_string = gmdate( $format_ics, $date_string );
-
-		return $date_string;
+		return gmdate( $format, $date );
 	}
 
 	// http://www.skyverge.com/blog/down-the-rabbit-hole-wordpress-and-timezones/

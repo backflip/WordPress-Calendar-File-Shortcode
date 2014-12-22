@@ -12,8 +12,8 @@ I don't really understand PHP. It's weird.
 [calendar start="31.12.2014 22:00" end="01.01.2015 05:00" title="Party"]
 
 ### Options
-- ```start```: **Mandatory**. Example: "31.12.2014 22:00". See ```dateformat```
-- ```end```: **Mandatory**. Example: "31.12.2014 22:00". See ```dateformat```
+- ```start```: **Mandatory**. Example: "31.12.2014 22:00". Has to be parseable by [strtotime](http://php.net/manual/en/function.strtotime.php).
+- ```end```: **Mandatory**. Example: "31.12.2014 22:00". Has to be parseable by [strtotime](http://php.net/manual/en/function.strtotime.php).
 - ```title```: **Mandatory**. Example: "Party"
 - ```location```: Example: "Kugl, St. Gallen". Default: empty.
 - ```description```: Example: "Incredibly awesome party.". Default: empty.
@@ -21,4 +21,3 @@ I don't really understand PHP. It's weird.
 - ```filename```: Used for .ics file. Default: "entry.ics".
 - ```linktext```: Title of download link. Default: "Add to calendar".
 - ```linkclass```: CSS class applied to download link. Default: "calendar".
-- ```dateformat```: Date format used in ```start``` and ```end``` params. Default: ```get_option( 'date_format' ) . ' ' . get_option( 'time_format' )``` as set in http://codex.wordpress.org/Settings_General_Screen.
