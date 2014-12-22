@@ -2,6 +2,10 @@
 
 Shortcode to render a link to an .ics calendar file.
 
+## Warning
+
+I don't really understand PHP. It's weird.
+
 ## Usage
 
 ### Minimal example
