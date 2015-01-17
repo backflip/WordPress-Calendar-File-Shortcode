@@ -104,7 +104,7 @@ class WP_ICS_Shortcode {
 		$id = $_GET['id'];
 
 		// Do nothing if URL does not correspond to setting
-		if ( $url = $this->download_url ) {
+		if ( $url == $this->download_url ) {
 			// Do nothing if no row with this ID is found
 			if ( $options = $this->get_options( $id ) ) {
 				header( 'Content-type: text/calendar; charset=utf-8', true, 200 );
